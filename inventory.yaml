@@ -5,7 +5,7 @@ master:
 
 nodes:
   hosts:
-    node1:
-      ansible_host: 195.242.16.188
+    # node1:
+    #   ansible_host: 195.242.16.188
     node2:
       ansible_host: 195.242.17.52

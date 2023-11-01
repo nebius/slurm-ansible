@@ -1,0 +1,56 @@
+- name: Copy new config
+  hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Pass options to dpkg on run
+      apt:
+        upgrade: dist
+        update_cache: yes
+
+    - name: Pass options to dpkg on run
+      apt:
+        pkg: 
+          - jq
+          - parallel
+          - squashfs-tools
+          - zstd
+
+    - name: Pass options to dpkg on run
+      apt:
+        pkg: 
+          - jq
+          - parallel
+          - squashfs-tools
+          - zstd
+    
+    - name: Copy enroot deb
+      copy:
+        src: files/enroot_3.4.1-1_amd64.deb
+        dest: /tmp/enroot_3.4.1-1_amd64.deb
+
+    
+    - name: Copy pyxis deb
+      copy:
+        src: files/nvslurm-plugin-pyxis_0.16.1-1_amd64.deb
+        dest: /tmp/nvslurm-plugin-pyxis_0.16.1-1_amd64.deb
+
+      
+    - name: Install enroot
+      shell: dpkg -i /tmp/enroot_3.4.1-1_amd64.deb
+    
+    - name: Install pyxis
+      shell: dpkg -i /tmp/nvslurm-plugin-pyxis_0.16.1-1_amd64.deb
+
+    - name: Create a symbolic link
+      file:
+        src: /usr/share/pyxis/pyxis.conf
+        dest: /etc/slurm-llnl/plugstack.conf.d/pyxis.conf
+        state: link
+
+    - name: Restarting slurm
+      systemd:
+        state: restarted
+        name: slurmd
+
+
