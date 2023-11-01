@@ -1,0 +1,11 @@
+AuthType=auth/munge
+DbdHost=node-master
+DebugLevel=info
+LogFile=/var/log/slurm/slurmdbd.log
+PidFile=/run/slurmdbd.pid
+SlurmUser=slurm
+StoragePass=${password}
+StorageUser=slurm
+StorageHost=${hostname}
+StorageLoc=slurm-db
+StorageType=accounting_storage/mysql
