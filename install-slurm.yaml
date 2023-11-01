@@ -1,0 +1,134 @@
+- name: Install slurm
+  hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Install munge and dependencies
+      ansible.builtin.apt:
+        pkg:
+          - munge
+          - build-essential
+          - git
+          - mariadb-server
+          - wget
+          - vim
+        update_cache: yes
+      
+    - name: Install slurm
+      ansible.builtin.apt:
+        pkg:
+          - slurmd
+          - slurm-client
+      
+      
+    - name: Copy cgroups config
+      ansible.builtin.copy:
+        src: files/cgroup.conf
+        dest: /etc/slurm-llnl/cgroup.conf
+
+    - name: copy slurm config
+      ansible.builtin.copy:
+        src: files/slurm2.conf
+        dest: /etc/slurm-llnl/slurm.conf
+      
+    - name: Update CPU configuration
+      ansible.builtin.shell: sudo sed -i "s/REPLACE_IT/CPUs=$(nproc)/g" /etc/slurm-llnl/slurm.conf
+      
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: stopped
+        name: munge
+
+- name: Run master
+  hosts: master
+  become: yes
+  become_user: root
+
+  tasks:
+    - name: Instal slurm for master
+      ansible.builtin.apt:
+        pkg:
+          - slurmctld
+#          - slurmdb
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: stopped
+        name: slurmctld
+  
+    # - name: Make sure a service unit is running
+    #   ansible.builtin.systemd:
+    #     state: stopped
+    #     name: slurmdbd
+      
+    # - name: Generate an OpenSSH rsa keypair with a different size (2048 bits)
+    #   community.crypto.openssh_keypair:
+    #     path: /home/briskly/.ssh/id_ssh_rsa.pub
+    #     size: 2048
+
+    # - name: Fetch SSH key
+    #   ansible.builtin.fetch:
+    #     src: /home/briskly/.ssh/id_ssh_rsa.pub
+    #     dest: files/id_ssh_rsa.pub
+
+    - name: Fetch munge key
+      ansible.builtin.fetch:
+        src: /etc/munge/munge.key
+        dest: files/munge.key
+        flat: yes
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: started
+        name: munge
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: started
+        name: slurmctld
+      
+    # - name: Make sure a service unit is running
+    #   ansible.builtin.systemd:
+    #     state: started
+    #     name: slurmdbd
+
+
+- name: Run nodes
+  hosts: nodes
+  become: yes
+  become_user: root
+  tasks:
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: stopped
+        name: slurmd
+    
+    # - name: Set authorized key taken from file
+    #   ansible.posix.authorized_key:
+    #     user: briskly
+    #     state: present
+    #     key: "{{ lookup('file', item) }}"
+    #   with_fileglob:
+    #     - files/*.pub
+
+    - name: copy munge.key config
+      ansible.builtin.copy:
+        src: files/munge.key
+        dest: /etc/munge/munge.key
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: started
+        name: munge
+
+    - name: Make sure a service unit is running
+      ansible.builtin.systemd:
+        state: started
+        name: slurmd
+    
+
+    # - name: Run worker
+    #   ansible.builtin.shell: slurmd -N $(hostname)
+
+
