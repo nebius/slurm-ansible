@@ -1,0 +1,34 @@
+- name: Copy new config
+  hosts: all
+  become: yes
+  become_user: root
+  tasks: 
+    - name: Copy cgroups config
+      ansible.builtin.copy:
+        src: files/cgroup.conf
+        dest: /etc/slurm-llnl/cgroup.conf
+
+    - name: copy slurm config
+      ansible.builtin.copy:
+        src: files/slurm.conf
+        dest: /etc/slurm-llnl/slurm.conf
+
+- name: Restarting master
+  hosts: master
+  become: yes
+  become_user: root
+  tasks:
+      - name: Make sure a service unit is running
+        ansible.builtin.systemd:
+          state: restarted
+          name: slurmctld
+
+- name: Restarting master
+  hosts: nodes 
+  become: yes
+  become_user: root
+  tasks:
+      - name: Make sure a service unit is running
+        ansible.builtin.systemd:
+          state: restarted
+          name: slurmd

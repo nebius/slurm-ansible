@@ -28,7 +28,7 @@
 
     - name: copy slurm config
       ansible.builtin.copy:
-        src: files/slurm2.conf
+        src: files/slurm.conf
         dest: /etc/slurm-llnl/slurm.conf
       
     - name: Update CPU configuration
@@ -50,27 +50,11 @@
       ansible.builtin.apt:
         pkg:
           - slurmctld
-#          - slurmdb
 
     - name: Make sure a service unit is running
       ansible.builtin.systemd:
         state: stopped
         name: slurmctld
-  
-    # - name: Make sure a service unit is running
-    #   ansible.builtin.systemd:
-    #     state: stopped
-    #     name: slurmdbd
-      
-    # - name: Generate an OpenSSH rsa keypair with a different size (2048 bits)
-    #   community.crypto.openssh_keypair:
-    #     path: /home/briskly/.ssh/id_ssh_rsa.pub
-    #     size: 2048
-
-    # - name: Fetch SSH key
-    #   ansible.builtin.fetch:
-    #     src: /home/briskly/.ssh/id_ssh_rsa.pub
-    #     dest: files/id_ssh_rsa.pub
 
     - name: Fetch munge key
       ansible.builtin.fetch:
@@ -87,11 +71,6 @@
       ansible.builtin.systemd:
         state: started
         name: slurmctld
-      
-    # - name: Make sure a service unit is running
-    #   ansible.builtin.systemd:
-    #     state: started
-    #     name: slurmdbd
 
 
 - name: Run nodes
@@ -103,14 +82,6 @@
       ansible.builtin.systemd:
         state: stopped
         name: slurmd
-    
-    # - name: Set authorized key taken from file
-    #   ansible.posix.authorized_key:
-    #     user: briskly
-    #     state: present
-    #     key: "{{ lookup('file', item) }}"
-    #   with_fileglob:
-    #     - files/*.pub
 
     - name: copy munge.key config
       ansible.builtin.copy:
@@ -127,8 +98,4 @@
         state: started
         name: slurmd
     
-
-    # - name: Run worker
-    #   ansible.builtin.shell: slurmd -N $(hostname)
-
 
