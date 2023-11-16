@@ -1,11 +1,8 @@
-master:
-  hosts:
-    master:
-      ansible_host: 195.242.16.80
+[master]
+195.242.17.227 ansible_user=slurm
 
-nodes:
-  hosts:
-    # node1:
-    #   ansible_host: 195.242.16.188
-    node2:
-      ansible_host: 195.242.17.52
+
+[nodes]
+195.242.17.27 ansible_user=slurm
+195.242.17.232 ansible_user=slurm
+195.242.16.177 ansible_user=slurm

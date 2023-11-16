@@ -4,31 +4,54 @@
   become_user: root
   tasks: 
     - name: Copy cgroups config
-      ansible.builtin.copy:
+      copy:
         src: files/cgroup.conf
-        dest: /etc/slurm-llnl/cgroup.conf
+        dest: /etc/slurm/cgroup.conf
 
-    - name: copy slurm config
-      ansible.builtin.copy:
+    - name: Copy slurm config
+      template:
         src: files/slurm.conf
-        dest: /etc/slurm-llnl/slurm.conf
+        dest: /etc/slurm/slurm.conf
 
-- name: Restarting master
+- name: Get munge from master and restart
   hosts: master
   become: yes
   become_user: root
   tasks:
-      - name: Make sure a service unit is running
-        ansible.builtin.systemd:
-          state: restarted
-          name: slurmctld
+    - name: Fetch munge key
+      fetch:
+        src: /etc/munge/munge.key
+        dest: files/munge.key
+        flat: yes
+        validate_checksum: yes
 
-- name: Restarting master
+    - name: Restart slurmctld
+      systemd:
+        state: restarted
+        name: slurmctld
+
+- name: Copy munge to nodes copy gres and restart
   hosts: nodes 
   become: yes
   become_user: root
   tasks:
-      - name: Make sure a service unit is running
-        ansible.builtin.systemd:
-          state: restarted
-          name: slurmd
+    - name: Copy munge.key config to nodes
+      copy:
+        src: files/munge.key
+        dest: /etc/munge/munge.key
+
+
+    - name: Copy gres.conf to nodes
+      copy:
+        src: files/gres.conf
+        dest: /etc/slurm/gres.conf
+
+    - name: Restart slurmd
+      systemd:
+        state: restarted
+        name: slurmd
+
+    - name: Restart munge
+      systemd:
+        state: restarted
+        name: munge

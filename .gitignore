@@ -1,1 +1,5 @@
-*/munge.key
+.terraform*
+key.json
+*.tfstate*
+files/munge.key
+terraform.tfvars
