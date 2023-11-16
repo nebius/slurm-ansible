@@ -1,0 +1,6 @@
+[master]
+${master}
+
+
+[nodes]
+${nodes}
