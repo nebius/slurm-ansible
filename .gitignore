@@ -3,3 +3,4 @@ key.json
 *.tfstate*
 files/munge.key
 terraform.tfvars
+inventory.yaml

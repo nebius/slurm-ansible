@@ -17,10 +17,8 @@ terraform {
 provider "nebius" {
   endpoint = "api.nemax.nebius.cloud:443"
   folder_id = var.folder_id
-  service_account_key_file = "key.json"
 }
 
 
 provider "local" {}
 
-provider "random" {}

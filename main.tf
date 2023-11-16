@@ -60,8 +60,6 @@ resource "nebius_compute_instance" "slurm-node" {
       "${path.module}/files/cloud-config.yaml.tftpl", {
         ENROOT_VERSION = "3.4.1"
         is_master      = "0"
-        nfs_ip_range   = var.local_net_range
-        mtu_size       = var.mtu_size
         sshkey         = var.sshkey
       })
   }
@@ -97,8 +95,6 @@ resource "nebius_compute_instance" "master" {
       "${path.module}/files/cloud-config.yaml.tftpl", {
         ENROOT_VERSION = "3.4.1"
         is_master      = "1"
-        nfs_ip_range   = var.local_net_range
-        mtu_size       = var.mtu_size
         sshkey         = var.sshkey
       })
   }
@@ -106,12 +102,12 @@ resource "nebius_compute_instance" "master" {
 
 
 resource "nebius_vpc_network" "slurm-network" {
-  name = "slurm-network-2"
+  name = "slurm-network"
 }
 
 resource "nebius_vpc_subnet" "subnet-1" {
-  name           = "subnet-2"
+  name           = "subnet-1"
   zone           = "eu-north1-c"
-  v4_cidr_blocks = [var.local_net_range]
+  v4_cidr_blocks = ["192.168.10.0/24"]
   network_id     = nebius_vpc_network.slurm-network.id
 }

@@ -1,6 +1,6 @@
-# Nebius NFS Module
+# Nebius slurm management Module
 
-This Terraform module provisions an NFS server on Nebius Cloud. It creates a virtual machine with a secondary disk attached, formats the disk, and sets up an NFS server that exports the disk as an NFS share.
+This Terraform module provisions a slurm cluster on Nebius Cloud. It creates a virtual machines for nodes and master configure them and may them ready to run. Additionally it installs plugins enroot and pyxis to make it possible to run container workloads
 
 ## Module Structure
 
@@ -8,10 +8,15 @@ The module includes the following files and directories:
 
 - `main.tf` - The main Terraform configuration file for the module.
 - `variables.tf` - Definitions of variables used within the module.
-- `outputs.tf` - Outputs after the module has been applied.
-- `provider.tf` - The provider configuration file (to be filled in with your provider's details).
+- `outputs.tf` - Outputs after the module has been applied. It creates inventory.yaml file
+- `versions.tf` - The provider configuration file (to be filled in with your provider's details).
+
 - `files/`
-  - `cloud-config.sh` - A shell script that initializes the NFS server on the virtual machine.
+  - `cloud-config.yaml.tfpl` - template for cloud-init to install slurm master or ndoes
+  - `slurm.conf` - config file for slurm that is distributed over hosts via ansible
+  - `cgroup.conf` - config file for slurm cgroups that is distributed over hosts via ansible
+  - `gres.conf` - config file for slurm cgroups that is distributed over nodes via ansible
+  - `inventory.tpl` - template for invetory file that terraform creates
 
 
 ## Configure Terraform for Nebius Cloud
@@ -30,9 +35,9 @@ export YC_TOKEN=$(ncp iam create-token)
 To use this module in your Terraform environment, you will need to create a Terraform configuration for example file `terraform.tfvars` with example conent:
 
 ```hcl
-folder_id = "bjebhkj34fo1db6n4gdu"
+folder_id = "<folder_id>" # folder where you want to create your resources
 sshkey = "<ssh_key>"
-cluster_nodes_count = 4
+cluster_nodes_count = 4 # amount of nodes
 ```
 
 Then you need to postinstall slurm config with ansbile
