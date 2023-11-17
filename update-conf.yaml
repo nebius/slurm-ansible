@@ -35,6 +35,13 @@
   become: yes
   become_user: root
   tasks:
+    - name: Copy topo file
+      copy:
+        src: files/inspur_topo_nccl_fix_qemu_orig.xml
+        dest: /etc/inspur_topo_nccl_fix_qemu_orig.xml
+    - name: Add new inspur_topo_nccl_fix_qemu_orig
+      shell: echo "export NCCL_TOPO_FILE=/etc/inspur_topo_nccl_fix_qemu_orig.xml" | tee -a /home/slurm/.bashrc
+
     - name: Copy munge.key config to nodes
       copy:
         src: files/munge.key
