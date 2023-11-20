@@ -27,6 +27,7 @@ MinJobAge=300
 KillWait=30
 Waittime=0
 
+
 #
 DebugFlags=NO_CONF_HASH
 
@@ -37,8 +38,22 @@ SlurmctldDebug=info
 SlurmctldLogFile=/var/log/slurm/slurmctld.log
 SlurmdDebug=info
 SlurmdLogFile=/var/log/slurm/slurmd.log
+
+
+#DB
+AccountingStorageType=accounting_storage/slurmdbd
+AccountingStorageHost=node-master
+JobAcctGatherType=jobacct_gather/linux
+JobCompType=jobcomp/mysql
+JobCompUser=slurm
+JobCompPass= ${password}
+JobCompHost= ${hostname}
+JobCompLoc=slurm-db
+
+
+
 GresTypes=gpu
 SelectType=select/cons_tres
 # COMPUTE NODES
-NodeName=node-[1-{{ groups['nodes'] | length }}] Gres=gpu:8 CPUs=160 RealMemory=1290080 State=idle State=UNKNOWN
+NodeName=node-[1-${cluster_nodes_count}] Gres=gpu:8 CPUs=160 RealMemory=1290080 State=idle State=UNKNOWN
 PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP

@@ -2,6 +2,13 @@ locals {
   cluster_nodes = [for node_num in range(1, var.cluster_nodes_count + 1): "node-${node_num}"]
 }
 
+resource "random_password" "mysql" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+
 resource "nebius_compute_gpu_cluster" "slurm-cluster" {
   name               = "slurm-cluster"
   interconnect_type  = "InfiniBand"
@@ -99,6 +106,41 @@ resource "nebius_compute_instance" "master" {
       })
   }
 }
+
+resource "nebius_mdb_mysql_cluster" "slurm-mysql-cluster" {
+  name                = "nebius-mysql-cluster"
+  environment         = "PRODUCTION"
+  network_id          = nebius_vpc_network.slurm-network.id
+  version             = "8.0" 
+
+  resources {
+    resource_preset_id = "s3-c8-m32"
+    disk_type_id       = "network-ssd"
+    disk_size          = "200"
+  }
+
+  host {
+    zone             = var.region
+    subnet_id        = nebius_vpc_subnet.subnet-1.id
+    assign_public_ip = true
+  }
+}
+
+resource "nebius_mdb_mysql_database" "slurm-db" {
+  cluster_id = nebius_mdb_mysql_cluster.slurm-mysql-cluster.id
+  name       = "slurm-db"
+}
+
+resource "nebius_mdb_mysql_user" "slurmuser" {
+  cluster_id =  nebius_mdb_mysql_cluster.slurm-mysql-cluster.id
+  name       = "slurm"
+  password   = random_password.mysql.result
+  permission {
+    database_name = nebius_mdb_mysql_database.slurm-db.name
+    roles         = ["ALL"]
+  }
+}
+
 
 
 resource "nebius_vpc_network" "slurm-network" {

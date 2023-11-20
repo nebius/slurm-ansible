@@ -9,7 +9,7 @@
         dest: /etc/slurm/cgroup.conf
 
     - name: Copy slurm config
-      template:
+      copy:
         src: files/slurm.conf
         dest: /etc/slurm/slurm.conf
 
@@ -24,6 +24,13 @@
         dest: files/munge.key
         flat: yes
         validate_checksum: yes
+    - name: Copy SlurmDB config
+      copy:
+        src: files/slurmdbd.conf
+        dest: /etc/slurm/slurmdbd.conf
+        owner: slurm
+        group: slurm
+        mode: '0600'
 
     - name: Restart slurmctld
       systemd:
