@@ -5,7 +5,7 @@ locals {
 resource "random_password" "mysql" {
   length           = 16
   special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  override_special = ""
 }
 
 
@@ -117,6 +117,9 @@ resource "nebius_mdb_mysql_cluster" "slurm-mysql-cluster" {
     resource_preset_id = "s3-c8-m32"
     disk_type_id       = "network-ssd"
     disk_size          = "200"
+  }
+  mysql_config = {
+    innodb_lock_wait_timeout = 900
   }
 
   host {

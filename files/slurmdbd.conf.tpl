@@ -1,5 +1,5 @@
 AuthType=auth/munge
-DbdHost=slurm-master
+DbdHost=node-master
 DebugLevel=info
 LogFile=/var/log/slurm/slurmdbd.log
 PidFile=/run/slurmdbd.pid

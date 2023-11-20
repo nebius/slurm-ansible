@@ -37,6 +37,11 @@
         state: restarted
         name: slurmctld
 
+    - name: Restart slurmctld
+      systemd:
+        state: restarted
+        name: slurmdbd
+
 - name: Copy munge to nodes copy gres and restart
   hosts: nodes 
   become: yes
