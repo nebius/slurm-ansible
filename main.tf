@@ -2,6 +2,12 @@ locals {
   cluster_nodes = [for node_num in range(1, var.cluster_nodes_count + 1): "node-${node_num}"]
 }
 
+resource "random_password" "mysql" {
+  length           = 16
+  special          = false
+}
+
+
 resource "nebius_compute_gpu_cluster" "slurm-cluster" {
   name               = "slurm-cluster"
   interconnect_type  = "InfiniBand"
@@ -30,7 +36,7 @@ resource "nebius_compute_instance" "slurm-node" {
   for_each       = toset( local.cluster_nodes )
   name           = "${each.key}"
   hostname       = "${each.key}"
-  platform_id    = "gpu-h100-b"
+  platform_id    = var.platform_id
   zone           = "eu-north1-c"
   gpu_cluster_id = nebius_compute_gpu_cluster.slurm-cluster.id
   service_account_id = nebius_iam_service_account.saccount.id
@@ -60,6 +66,7 @@ resource "nebius_compute_instance" "slurm-node" {
       "${path.module}/files/cloud-config.yaml.tftpl", {
         ENROOT_VERSION = "3.4.1"
         is_master      = "0"
+        is_mysql       = var.mysql_jobs_backend
         sshkey         = var.sshkey
       })
   }
@@ -95,8 +102,56 @@ resource "nebius_compute_instance" "master" {
       "${path.module}/files/cloud-config.yaml.tftpl", {
         ENROOT_VERSION = "3.4.1"
         is_master      = "1"
+        is_mysql       = var.mysql_jobs_backend
         sshkey         = var.sshkey
       })
+  }
+}
+
+resource "nebius_mdb_mysql_cluster" "slurm-mysql-cluster" {
+  count               = var.mysql_jobs_backend ? 1 : 0
+  name                = "nebius-mysql-cluster"
+  environment         = "PRODUCTION"
+  network_id          = nebius_vpc_network.slurm-network.id
+  version             = "8.0" 
+
+  resources {
+    resource_preset_id = "s3-c8-m32"
+    disk_type_id       = "network-ssd"
+    disk_size          = "200"
+  }
+  mysql_config = {
+    innodb_lock_wait_timeout = 900
+  }
+
+  host {
+    zone             = var.region
+    subnet_id        = nebius_vpc_subnet.subnet-1.id
+    assign_public_ip = false
+    priority  = 90
+  }
+
+  host {
+    zone             = var.region
+    subnet_id        = nebius_vpc_subnet.subnet-1.id
+    assign_public_ip = false
+  }
+}
+
+resource "nebius_mdb_mysql_database" "slurm-db" {
+  count        = var.mysql_jobs_backend ? 1 : 0
+  cluster_id   = nebius_mdb_mysql_cluster.slurm-mysql-cluster[0].id
+  name         = "slurm-db"
+}
+
+resource "nebius_mdb_mysql_user" "slurmuser" {
+  count      = var.mysql_jobs_backend ? 1 : 0
+  cluster_id =  nebius_mdb_mysql_cluster.slurm-mysql-cluster[0].id
+  name       = "slurm"
+  password   = random_password.mysql.result
+  permission {
+    database_name = nebius_mdb_mysql_database.slurm-db[0].name
+    roles         = ["ALL"]
   }
 }
 

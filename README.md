@@ -13,10 +13,13 @@ The module includes the following files and directories:
 
 - `files/`
   - `cloud-config.yaml.tfpl` - template for cloud-init to install slurm master or ndoes
-  - `slurm.conf` - config file for slurm that is distributed over hosts via ansible
+  - `slurm.conf.tpl` - template for slurm config file that is distributed over hosts via ansible
+  - `slurmdbd.conf.tpl` - template for slurmdb config file for master node
   - `cgroup.conf` - config file for slurm cgroups that is distributed over hosts via ansible
   - `gres.conf` - config file for slurm cgroups that is distributed over nodes via ansible
   - `inventory.tpl` - template for invetory file that terraform creates
+  - `*_topo_nccl*.xml` - correct topolgies for Infiniband devices that is distrubuted over nodes
+  
 
 
 ## Configure Terraform for Nebius Cloud
@@ -38,6 +41,8 @@ To use this module in your Terraform environment, you will need to create a Terr
 folder_id = "<folder_id>" # folder where you want to create your resources
 sshkey = "<ssh_key>"
 cluster_nodes_count = 4 # amount of nodes
+mysql_jobs_backend = false  # Do you want to use mysql
+platform-id = false  # gpu-h100-b for Inspur, gpu-h100 for Gigabyte
 ```
 
 Then you need to postinstall slurm config with ansbile

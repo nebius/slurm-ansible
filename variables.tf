@@ -24,3 +24,17 @@ variable "sshkey" {
   type        = string
   description = "Public SSH key"
 }
+
+variable "platform_id" {
+  type        = string
+  description = "Platform for nodes: gpu-h100-b for Inspur or gpu-h100 for Gigabyte"
+  default     = "gpu-h100-b"
+}
+
+
+variable "mysql_jobs_backend" {
+  type        = bool
+  description = "Use MySQL for jobs logging in slurm: 1 or 0"
+  default     = true
+}
+

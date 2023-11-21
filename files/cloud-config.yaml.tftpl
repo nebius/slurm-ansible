@@ -8,9 +8,10 @@ users:
       - ${sshkey}
 
 runcmd:
- - wget -O - https://monitoring.api.nemax.nebius.cloud/monitoring/v2/gpu-metrics-exporter/install.sh | bash
- - apt-get install -y munge slurmd slurm-client ca-certificates curl gnupg jq numactl make gcc libelf-dev libssl-dev bc flex bison squashfs-tools parallel libnvidia-container-tools pigz squashfuse fuse-overlayfs bsdmainutils ncal libslurm-dev
- - if [ ${is_master} -eq 1 ]; then apt-get install -y slurmctld; fi
+ - if [ ${is_master} -eq 0 ]; then wget -O - https://monitoring.api.nemax.nebius.cloud/monitoring/v2/gpu-metrics-exporter/install.sh | bash; fi
+ - apt-get install -y munge slurmdbd slurmd slurm-client ca-certificates curl gnupg jq numactl make gcc libelf-dev libssl-dev bc flex bison squashfs-tools parallel libnvidia-container-tools pigz squashfuse fuse-overlayfs bsdmainutils ncal libslurm-dev
+ - if [ ${is_master} -eq 1 ]; then apt-get install -y slurmctld; systemctl disable slurmd; systemctl enable slurmctld; fi
+ - if [ ${is_master} -eq 1 ] && [ ${is_mysql} ]; then apt-get install -y slurmdbd; systemctl enable slurmdbd; fi
  - export DEBIAN_FRONTEND=noninteractive
  - wget https://github.com/NVIDIA/enroot/releases/download/v${ENROOT_VERSION}/enroot_${ENROOT_VERSION}-1_amd64.deb
  - wget https://github.com/NVIDIA/enroot/releases/download/v${ENROOT_VERSION}/enroot+caps_${ENROOT_VERSION}-1_amd64.deb
@@ -21,8 +22,6 @@ runcmd:
  - mkdir -p /var/lib/slurm/pyxis
  - echo "required /usr/local/lib/slurm/spank_pyxis.so runtime_path=/var/lib/slurm/pyxis" | tee /etc/slurm/plugstack.conf.d/pyxis.conf
  - mkdir -p /var/lib/slurm/enroot/ /var/spool/slurmd  /var/spool/enroot && chown -R slurm:slurm /var/lib/slurm/ /var/spool/slurmd/  /var/spool/enroot
- - if [ ${is_master} -eq 1 ]; then systemctl stop slurmd; systemctl disable slurmd; service slurmctld restart; fi
- - if [ ${is_master} -eq 0 ]; then systemctl stop slurmctld; systemctl disable slurmstld; service slurmd restart; fi
  - mkdir -p /etc/systemd/system/slurmd.service.d/
 write_files:
 - path: /etc/systemd/system/slurmd.service.d/local.conf

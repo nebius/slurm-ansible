@@ -4,3 +4,6 @@ key.json
 files/munge.key
 terraform.tfvars
 inventory.yaml
+files/slurmdbd.conf
+files/slurm.conf
+.DS_Store
