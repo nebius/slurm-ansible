@@ -32,24 +32,22 @@ Waittime=0
 DebugFlags=NO_CONF_HASH
 
 # LOGGING/ACCOUNTNG
-
-JobAcctGatherType=jobacct_gather/none
 SlurmctldDebug=info
 SlurmctldLogFile=/var/log/slurm/slurmctld.log
 SlurmdDebug=info
 SlurmdLogFile=/var/log/slurm/slurmd.log
-
+JobAcctGatherType=jobacct_gather/none
 
 #DB
+%{ if is_mysql }
 AccountingStorageType=accounting_storage/slurmdbd
 AccountingStorageHost=node-master
-JobAcctGatherType=jobacct_gather/linux
 JobCompType=jobcomp/mysql
 JobCompUser=slurm
 JobCompPass= ${password}
 JobCompHost= ${hostname}
 JobCompLoc=slurm-db
-
+%{ endif }
 
 
 GresTypes=gpu

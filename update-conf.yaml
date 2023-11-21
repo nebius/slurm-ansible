@@ -18,13 +18,8 @@
   become: yes
   become_user: root
   tasks:
-    - name: Fetch munge key
-      fetch:
-        src: /etc/munge/munge.key
-        dest: files/munge.key
-        flat: yes
-        validate_checksum: yes
     - name: Copy SlurmDB config
+      when: is_mysql
       copy:
         src: files/slurmdbd.conf
         dest: /etc/slurm/slurmdbd.conf
@@ -32,15 +27,26 @@
         group: slurm
         mode: '0600'
 
+    - name: Restart slurmdbd
+      when: is_mysql
+      systemd:
+        state: restarted
+        name: slurmdbd
+
+    - name: Fetch munge key
+      fetch:
+        src: /etc/munge/munge.key
+        dest: files/munge.key
+        flat: yes
+        validate_checksum: yes
+
     - name: Restart slurmctld
       systemd:
         state: restarted
         name: slurmctld
 
-    - name: Restart slurmctld
-      systemd:
-        state: restarted
-        name: slurmdbd
+
+
 
 - name: Copy munge to nodes copy gres and restart
   hosts: nodes 
@@ -49,10 +55,10 @@
   tasks:
     - name: Copy topo file
       copy:
-        src: files/inspur_topo_nccl_fix_qemu_orig.xml
-        dest: /etc/inspur_topo_nccl_fix_qemu_orig.xml
-    - name: Add new inspur_topo_nccl_fix_qemu_orig
-      shell: echo "export NCCL_TOPO_FILE=/etc/inspur_topo_nccl_fix_qemu_orig.xml" | tee -a /home/slurm/.bashrc
+        src: files/{{ topo_file }}
+        dest: /etc/{{ topo_file }}
+    - name: Add new topofile
+      shell: echo "export NCCL_TOPO_FILE=/etc/{{ topo_file }}" | tee -a /home/slurm/.bashrc
 
     - name: Copy munge.key config to nodes
       copy:
