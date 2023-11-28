@@ -55,10 +55,10 @@
   tasks:
     - name: Copy topo file
       copy:
-        src: files/{{ topo_file }}
-        dest: /etc/{{ topo_file }}
+        src: files/nccl-topo-h100-v1.xml
+        dest: /etc/nccl-topo-h100-v1.xml
     - name: Add new topofile
-      shell: echo "export NCCL_TOPO_FILE=/etc/{{ topo_file }}" | tee -a /home/slurm/.bashrc
+      shell: echo "export NCCL_TOPO_FILE=/etc/nccl-topo-h100-v1.xml" | tee -a /home/slurm/.bashrc
 
     - name: Copy munge.key config to nodes
       copy:
