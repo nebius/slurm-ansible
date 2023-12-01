@@ -42,7 +42,7 @@ folder_id = "<folder_id>" # folder where you want to create your resources
 sshkey = "<ssh_key>"
 cluster_nodes_count = 4 # amount of nodes
 mysql_jobs_backend = false  # Do you want to use mysql
-platform-id = false  # gpu-h100-b for Inspur, gpu-h100 for Gigabyte
+platform-id = false  # gpu-h100 or gpu-h100-b
 ```
 
 Then you need to postinstall slurm config with ansbile
