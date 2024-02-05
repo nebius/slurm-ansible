@@ -58,7 +58,11 @@
         src: files/nccl-topo-h100-v1.xml
         dest: /etc/nccl-topo-h100-v1.xml
     - name: Add new topofile
-      shell: echo "export NCCL_TOPO_FILE=/etc/nccl-topo-h100-v1.xml" | tee -a /home/slurm/.bashrc
+      lineinfile:
+        path: /home/slurm/.bashrc
+        line: 'export NCCL_TOPO_FILE=/etc/nccl-topo-h100-v1.xml'
+        create: no
+        state: present
 
     - name: Copy munge.key config to nodes
       copy:
