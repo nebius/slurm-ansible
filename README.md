@@ -42,10 +42,11 @@ folder_id = "<folder_id>" # folder where you want to create your resources
 sshkey = "<ssh_key>"
 cluster_nodes_count = 4 # amount of nodes
 mysql_jobs_backend = false  # Do you want to use mysql
-platform-id = false  # gpu-h100 or gpu-h100-b
+platform_id = false  # gpu-h100 or gpu-h100-b
 ```
 
-Then you need to postinstall slurm config with ansbile
+Then you can monitor the progress of cloud-init scripts:
 ```bash
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.yaml update-conf.yaml
+ssh -i <ssh-key-path> slurm@<node-master-ip>
+sudo tail -f /var/log/cloud-init-output.log
 ```
