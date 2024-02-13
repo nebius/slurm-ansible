@@ -29,10 +29,10 @@ resource "nebius_vpc_route_table" "slurm-route-table"{
 }
 
 
-# resource "nebius_vpc_address" "node-master-ip" {
-#   name = "node-master-ip"
+resource "nebius_vpc_address" "node-master-ip" {
+  name = "node-master-ip"
 
-#   external_ipv4_address {
-#     zone_id = "eu-north1-c"
-#   }
-# }
+  external_ipv4_address {
+    zone_id = "eu-north1-c"
+  }
+}

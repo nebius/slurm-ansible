@@ -38,7 +38,7 @@ resource "nebius_compute_instance" "master" {
 
   network_interface {
     subnet_id = nebius_vpc_subnet.slurm-subnet.id
-    #nat_ip_address  = nebius_vpc_address.node-master-ip.external_ipv4_address[0].address
+    nat_ip_address  = nebius_vpc_address.node-master-ip.external_ipv4_address[0].address
     nat = true
   }
 

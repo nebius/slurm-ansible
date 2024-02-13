@@ -69,8 +69,8 @@ write_files:
 - path: /etc/systemd/system/slurmd.service.d/local.conf
   content: |
     [Service]
-    User=slurm
-    Group=slurm
+    User=root
+    Group=root
     PIDFile=/run/slurm/slurmd.pid
 - path: /etc/enroot/enroot.conf.d/enroot.conf
   content: |
@@ -92,7 +92,7 @@ write_files:
     SlurmctldHost=node-master
 
     SlurmUser=slurm
-    SlurmdUser=slurm
+    SlurmdUser=root
     SlurmctldPort=6817
     SlurmdPort=6818
     AuthType=auth/munge

@@ -90,7 +90,7 @@ write_files:
     SlurmctldHost=node-master
 
     SlurmUser=slurm
-    SlurmdUser=slurm
+    SlurmdUser=root
     SlurmctldPort=6817
     SlurmdPort=6818
     AuthType=auth/munge
@@ -156,12 +156,6 @@ write_files:
     StorageHost=${hostname}
     StorageLoc=slurm-db
     StorageType=accounting_storage/mysql
-# - path: /etc/slurm/gres.conf
-#   content: |
-#     #AutoDetect=nvml
-#     # nvidia-smi topo -m
-#     Name=gpu Type=gpu File=/dev/nvidia[0-3] Cores=0-79
-#     Name=gpu Type=gpu File=/dev/nvidia[4-7] Cores=80-159
 - path: /tmp/setup_auth.sh
   content: |
     #!/bin/bash
